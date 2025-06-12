@@ -16,7 +16,6 @@ provider:
 
   environment:
     FLY_API_KEY: ${env:FLY_API_KEY}
-    ACCOUNT_ID: ${env:ACCOUNT_ID}
     HS_TOKEN: ${env:HS_TOKEN}
     SLACK_WEBHOOK: ${env:SLACK_WEBHOOK}
 

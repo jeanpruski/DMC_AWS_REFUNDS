@@ -8,7 +8,7 @@ module.exports.process = async (event) => {
   
   const yesterdayDate = await toolsService.getYesterdayDate();
   const refunds = await flywireService.getRefunds(yesterdayDate);
-  if(refunds[0]){
+  if(refunds && refunds[0]){
     const csv = await toolsService.convertToCSV(refunds);
     const config = await hubspotService.getConfig();
     const importFileId = await hubspotService.importCsv(config, csv);
@@ -25,8 +25,6 @@ module.exports.process = async (event) => {
     console.log(message);
     await toolsService.sendSlackAlert(message)
   }
-
-  console.log('test')
 
   return {
     statusCode: 200,
