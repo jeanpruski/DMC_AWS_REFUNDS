@@ -1,0 +1,28 @@
+service: dmc-refunds
+
+useDotenv: true
+
+frameworkVersion: "3"
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: eu-west-3
+  profile: dmc
+
+  environment:
+    FLY_API_KEY: ${env:FLY_API_KEY}
+    ACCOUNT_ID: ${env:ACCOUNT_ID}
+    HS_TOKEN: ${env:HS_TOKEN}
+    SLACK_WEBHOOK: ${env:SLACK_WEBHOOK}
+
+functions:
+  handler:
+    handler: handler.process
+    timeout: 300
+
+
