@@ -38,7 +38,7 @@ const toolsService = {
       text: messageText
     };
 
-    axios.post(webhookUrl, message)
+    await axios.post(webhookUrl, message)
       .then(() => {
         console.log('✅ Message envoyé sur Slack');
       })
