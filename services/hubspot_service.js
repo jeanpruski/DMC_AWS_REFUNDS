@@ -78,40 +78,40 @@ const hubspotService = {
     }
   },
   monitorHubspotImportAndNotifySlack: async function(importId) {
-  const importUrl = `https://api.hubapi.com/crm/v3/imports/${importId}`;
-  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+    const importUrl = `https://api.hubapi.com/crm/v3/imports/${importId}`;
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-  while (true) {
-    try {
-      const response = await axios.get(importUrl, {
-        headers: {
-          Authorization: `Bearer ${token}`
+    while (true) {
+      try {
+        const response = await axios.get(importUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const { state, importName } = response.data;
+        console.log(`⏳ Import "${importName}" - état : ${state}`);
+        if (state === 'DONE' || state === 'FAILED') {
+          let message = {
+            text: `📦 Import HubSpot terminé : *${importName}* → État : *${state}*`
+          };
+
+          if(response?.data?.metadata){
+            message.text = message.text + `\n\`\`\`${JSON.stringify(response.data.metadata, undefined, 2)}\`\`\``;
+          }
+
+          await axios.post(process.env.SLACK_WEBHOOK, message);
+          console.log('✅ Notification Slack envoyée.');
+          break;
         }
-      });
 
-      const { state, importName } = response.data;
-      console.log(`⏳ Import "${importName}" - état : ${state}`);
-      if (state === 'DONE' || state === 'FAILED') {
-        let message = {
-          text: `📦 Import HubSpot terminé : *${importName}* → État : *${state}*`
-        };
-
-        if(response?.data?.metadata){
-          message.text = message.text + `\n\`\`\`${JSON.stringify(response.data.metadata, undefined, 2)}\`\`\``;
-        }
-
-        await axios.post(process.env.SLACK_WEBHOOK, message);
-        console.log('✅ Notification Slack envoyée.');
+        await delay(1000);
+      } catch (error) {
+        console.error('❌ Erreur API HubSpot ou Slack :', error.response?.status, error.response?.data);
         break;
       }
-
-      await delay(1000);
-    } catch (error) {
-      console.error('❌ Erreur API HubSpot ou Slack :', error.response?.status, error.response?.data);
-      break;
     }
   }
-}
 }
 
 module.exports = hubspotService;
